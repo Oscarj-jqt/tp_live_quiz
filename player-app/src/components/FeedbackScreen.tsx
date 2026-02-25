@@ -27,9 +27,14 @@ function FeedbackScreen({ correct, score }: FeedbackScreenProps) {
   return (
     <div className="phase-container feedback-container">
       {/* TODO: Conteneur .feedback avec .correct ou .incorrect */}
-      {/* TODO: Icone .feedback-icon */}
-      {/* TODO: Texte "Bonne reponse !" ou "Mauvaise reponse" */}
-      {/* TODO: Score "Score : {score} pts" */}
+      <div className={`feedback ${correct ? 'correct' : 'incorrect'}`}>
+        {/* TODO: Icone .feedback-icon */}
+        <div className="feedback-icon"></div>
+        {/* TODO: Texte "Bonne reponse !" ou "Mauvaise reponse" */}
+        <p className="feedback-text">{correct ? 'Bonne reponse !' : 'Mauvaise reponse'}</p>
+        {/* TODO: Score "Score : {score} pts" */}
+        <p className="feedback-score">Score : {score} pts</p>
+      </div>
     </div>
   )
 }
