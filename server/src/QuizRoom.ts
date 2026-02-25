@@ -176,8 +176,13 @@ export class QuizRoom {
    */
   private tick(): void {
     // TODO: Decrementer remaining
+    this.remaining--
     // TODO: Envoyer 'tick' a tous
+    broadcast(this.getPlayerWsList(), { type: 'tick', remaining: this.remaining })
     // TODO: Si temps ecoule, appeler timeUp()
+    if (this.remaining <= 0) {
+      this.timeUp()
+    }
   }
 
   /**
