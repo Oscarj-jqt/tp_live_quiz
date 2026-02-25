@@ -77,8 +77,14 @@ wss.on('connection', (ws: WebSocket) => {
       // ============================================================
       case 'answer': {
         // TODO: Recuperer le { room, playerId } depuis clientRoomMap
+        const playerInfo = clientRoomMap.get(ws)
         // TODO: Si non trouve, envoyer une erreur
+        if (!playerInfo) {
+          send(ws, { type: 'error', message: 'Vous devez rejoindre un quiz avant de repondre' })
+          return
+        }
         // TODO: Appeler room.handleAnswer(playerId, message.choiceIndex)
+        playerInfo.room.handleAnswer(playerInfo.playerId, message.choiceIndex)
         break
       }
 
@@ -87,12 +93,23 @@ wss.on('connection', (ws: WebSocket) => {
       // ============================================================
       case 'host:create': {
         // TODO: Generer un code unique avec generateQuizCode()
+        let code: string
+        do {
+          code = generateQuizCode()
+        } while (rooms.has(code))
         // TODO: Creer une nouvelle QuizRoom (id = Date.now().toString(), code)
+        const room = new QuizRoom(Date.now().toString(), code)
         // TODO: Assigner hostWs, title, questions sur la room
+        room.hostWs = ws
+        room.title = message.title
+        room.questions = message.questions
         // TODO: Stocker la room dans rooms (cle = code)
+        rooms.set(code, room)
         // TODO: Stocker l'association host ws -> room dans hostRoomMap
+        hostRoomMap.set(ws, room)
         // TODO: Envoyer un message sync au host : { type: 'sync', phase: 'lobby', data: { quizCode: code } }
-        console.log(`[Server] Quiz cree avec le code: ???`)
+        send(ws, { type: 'sync', phase: 'lobby', data: { quizCode: code } })
+        console.log(`[Server] Quiz cree avec le code: ${code}`)
         break
       }
 
@@ -101,8 +118,14 @@ wss.on('connection', (ws: WebSocket) => {
       // ============================================================
       case 'host:start': {
         // TODO: Recuperer la room depuis hostRoomMap
+        const room = hostRoomMap.get(ws)
         // TODO: Si non trouvee, envoyer une erreur
+        if (!room) {
+          send(ws, { type: 'error', message: 'Vous devez creer un quiz avant de le demarrer' })
+          return
+        }
         // TODO: Appeler room.start()
+        room.start()
         break
       }
 
@@ -111,8 +134,14 @@ wss.on('connection', (ws: WebSocket) => {
       // ============================================================
       case 'host:next': {
         // TODO: Recuperer la room depuis hostRoomMap
+        const room = hostRoomMap.get(ws)
         // TODO: Si non trouvee, envoyer une erreur
+        if (!room) {
+          send(ws, { type: 'error', message: 'Vous devez creer un quiz avant de passer a la question suivante' })
+          return
+        }
         // TODO: Appeler room.nextQuestion()
+        room.nextQuestion()
         break
       }
 
@@ -121,10 +150,23 @@ wss.on('connection', (ws: WebSocket) => {
       // ============================================================
       case 'host:end': {
         // TODO: Recuperer la room depuis hostRoomMap
+        const room = hostRoomMap.get(ws)
         // TODO: Si non trouvee, envoyer une erreur
+        if (!room) {
+          send(ws, { type: 'error', message: 'Vous devez creer un quiz avant de le terminer' })
+          return
+        }
         // TODO: Appeler room.end()
+        room.end()
         // TODO: Supprimer la room de rooms
+        rooms.delete(room.code)
         // TODO: Nettoyer hostRoomMap et clientRoomMap
+        hostRoomMap.delete(ws)
+        for (const [clientWs, info] of clientRoomMap.entries()) {
+          if (info.room === room) {
+            clientRoomMap.delete(clientWs)
+          }
+        }
         break
       }
 
@@ -139,7 +181,17 @@ wss.on('connection', (ws: WebSocket) => {
     console.log('[Server] Connexion fermee')
 
     // TODO: Nettoyer clientRoomMap si c'etait un joueur
+    for (const [clientWs, info] of clientRoomMap.entries()) {
+      if (clientWs === ws) {
+        clientRoomMap.delete(ws)
+        break
+      }
+    }
+
     // TODO: Nettoyer hostRoomMap si c'etait un host
+    if (hostRoomMap.has(ws)) {
+      hostRoomMap.delete(ws)
+    }
   })
 
   ws.on('error', (err: Error) => {
