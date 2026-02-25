@@ -193,8 +193,14 @@ export class QuizRoom {
    */
   private timeUp(): void {
     // TODO: Annuler le timer
+    if (this.timerId) {
+      clearInterval(this.timerId)
+      this.timerId = null
+    }
     // TODO: Changer la phase
+    this.phase = 'results'
     // TODO: Envoyer les resultats
+    this.broadcastResults()
   }
 
   /**
@@ -203,7 +209,7 @@ export class QuizRoom {
    */
   private getPlayerWsList(): WebSocket[] {
     // TODO: Extraire les ws de this.players.values()
-    return []
+    return Array.from(this.players.values()).map(players => players.ws)
   }
 
   /**
@@ -211,7 +217,11 @@ export class QuizRoom {
    */
   private broadcastToAll(message: ServerMessage): void {
     // TODO: Envoyer au host si connecte
+    if (this.hostWs) {
+      send(this.hostWs, message)
+    }
     // TODO: Envoyer a tous les joueurs via broadcast()
+    broadcast(this.getPlayerWsList(), message)
   }
 
   /**
@@ -221,8 +231,16 @@ export class QuizRoom {
    */
   private broadcastQuestion(): void {
     // TODO: Recuperer la question courante
+    const currentQuestion = this.questions[this.currentQuestionIndex]
     // TODO: Creer l'objet question SANS correctIndex (utiliser destructuring)
+    const { correctIndex, ...questionWithoutCorrectIndex } = currentQuestion
     // TODO: Envoyer a tous via broadcastToAll()
+    this.broadcastToAll({
+      type: 'question',
+      question: questionWithoutCorrectIndex,
+      index: this.currentQuestionIndex,
+      total: this.questions.length
+    })
   }
 
   /**
@@ -233,9 +251,24 @@ export class QuizRoom {
    */
   private broadcastResults(): void {
     // TODO: Recuperer la question courante
+    const currentQuestion = this.questions[this.currentQuestionIndex]
     // TODO: Calculer la distribution des reponses
+    const distribution = Array(currentQuestion.choices.length).fill(0)
+    this.answers.forEach((choiceIndex, playerId) => {
+      distribution[choiceIndex]++
+    })
     // TODO: Construire l'objet scores { nom: score }
+    const scores: Record<string, number> = {}
+    this.players.forEach((player, playerId) => {
+      scores[player.name] = this.scores.get(playerId) || 0
+    })
     // TODO: Envoyer 'results' a tous
+    this.broadcastToAll({
+      type: 'results',
+      correctIndex: currentQuestion.correctIndex,
+      distribution,
+      scores
+    })
   }
 
   /**
@@ -246,8 +279,18 @@ export class QuizRoom {
    */
   broadcastLeaderboard(): void {
     // TODO: Construire le tableau rankings trie par score decroissant
+    const rankings = Array.from(this.players.values()).map(player => ({
+      name: player.name,
+      score: this.scores.get(player.id) || 0
+    }))
+    .sort((a, b) => b.score - a.score)
     // TODO: Changer la phase
+    this.phase = 'leaderboard'
     // TODO: Envoyer 'leaderboard' a tous
+    this.broadcastToAll({
+      type: 'leaderboard',
+      rankings
+    })
   }
 
   /**
@@ -258,7 +301,13 @@ export class QuizRoom {
    */
   end(): void {
     // TODO: Annuler le timer
+    if (this.timerId) {
+      clearInterval(this.timerId)
+      this.timerId = null
+    }
     // TODO: Changer la phase
+    this.phase = 'ended'
     // TODO: Envoyer 'ended' a tous
+    this.broadcastToAll({ type: 'ended' })
   }
 }
