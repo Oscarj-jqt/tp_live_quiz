@@ -54,10 +54,21 @@ wss.on('connection', (ws: WebSocket) => {
       // ============================================================
       case 'join': {
         // TODO: Recuperer la salle avec message.quizCode depuis la map rooms
+        const room = rooms.get(message.quizCode)
         // TODO: Si la salle n'existe pas, envoyer une erreur
+        if (!room) {
+          send(ws, { type: 'error', message: 'Code de quiz invalide' })
+          return
+        }
         // TODO: Si la salle n'est pas en phase 'lobby', envoyer une erreur
+        if (room.phase !== 'lobby') {
+          send(ws, { type: 'error', message: 'Le quiz a deja commence' })
+          return
+        }
         // TODO: Appeler room.addPlayer(message.name, ws)
+        const playerId = room.addPlayer(message.name, ws)
         // TODO: Stocker l'association ws -> { room, playerId } dans clientRoomMap
+        clientRoomMap.set(ws, { room, playerId })
         break
       }
 
