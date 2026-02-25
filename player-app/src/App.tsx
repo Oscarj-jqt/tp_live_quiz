@@ -24,6 +24,7 @@ function App() {
   const [currentQuestion, setCurrentQuestion] = useState<Omit<QuizQuestion, 'correctIndex'> | null>(null)
   const [remaining, setRemaining] = useState(0)
   const [hasAnswered, setHasAnswered] = useState(false)
+  const [playerAnswer, setPlayerAnswer] = useState<number | null>(null)
   const [lastCorrect, setLastCorrect] = useState(false)
   const [score, setScore] = useState(0)
   const [rankings, setRankings] = useState<{ name: string; score: number }[]>([])
@@ -54,6 +55,7 @@ function App() {
         setRemaining(lastMessage.question.timerSec)
         // TODO: Reinitialiser hasAnswered a false
         setHasAnswered(false)
+        setPlayerAnswer(null)
         // TODO: Changer la phase en 'question'
         setPhase('question')
         break
@@ -68,7 +70,7 @@ function App() {
       case 'results': {
         // TODO: Verifier si le joueur a repondu correctement
         //   (comparer la reponse du joueur avec lastMessage.correctIndex)
-        const wasCorrect = lastMessage.correctIndex !== undefined
+        const wasCorrect = playerAnswer !== null && playerAnswer === lastMessage.correctIndex
         // TODO: Mettre a jour lastCorrect (true/false)
         setLastCorrect(wasCorrect)
         // TODO: Recuperer le score du joueur depuis lastMessage.scores
@@ -120,6 +122,8 @@ function App() {
     if (!currentQuestion || hasAnswered) return
     // TODO: Marquer hasAnswered a true
     setHasAnswered(true)
+    // TODO: Sauvegarder la reponse du joueur pour la comparer avec correctIndex
+    setPlayerAnswer(choiceIndex)
     // TODO: Envoyer un message 'answer' au serveur avec l'id de la question et le choiceIndex
     sendMessage({ type: 'answer', questionId: currentQuestion.id, choiceIndex })
   }

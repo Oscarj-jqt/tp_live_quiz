@@ -45,7 +45,7 @@ function AnswerScreen({ question, remaining, onAnswer, hasAnswered }: AnswerScre
     onAnswer(index)
   }
 
-  const timerClass = remaining <= 3 ? 'danger' : remaining <= 5 ? 'warning' : ''
+  const timerClass = remaining <= 3 ? 'danger' : remaining <= 10 ? 'warning' : ''
 
   return (
     <div className="answer-screen">
