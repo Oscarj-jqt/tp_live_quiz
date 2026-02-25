@@ -30,10 +30,18 @@ function ScoreScreen({ rankings, playerName }: ScoreScreenProps) {
   return (
     <div className="phase-container score-screen">
       {/* TODO: Titre "Classement" avec .leaderboard-title */}
+      <h2 className="leaderboard-title">Classement</h2>
       <div className="leaderboard">
         {/* TODO: Pour chaque joueur dans rankings, afficher un .leaderboard-item */}
         {/* TODO: Ajouter la classe .is-me si ranking.name === playerName */}
         {/* TODO: Afficher rang, nom et score */}
+        {rankings.map((r, i) => (
+          <div key={r.name} className={`leaderboard-item ${r.name === playerName ? 'is-me' : ''}`}>
+            <span className="leaderboard-rank">{i + 1}</span>
+            <span className="leaderboard-name">{r.name}</span>
+            <span className="leaderboard-score">{r.score} pts</span>
+          </div>
+        ))}
       </div>
     </div>
   )
