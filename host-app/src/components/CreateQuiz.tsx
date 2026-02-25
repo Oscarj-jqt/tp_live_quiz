@@ -33,7 +33,9 @@ interface CreateQuizProps {
  * .btn-add-question, .btn-remove, .btn-primary
  */
 function CreateQuiz({ onSubmit }: CreateQuizProps) {
+  // TODO: State pour le titre
   const [title, setTitle] = useState('')
+  // TODO: State pour la liste des questions
   const [questions, setQuestions] = useState<QuizQuestion[]>([])
 
   const addQuestion = () => {
@@ -74,31 +76,37 @@ function CreateQuiz({ onSubmit }: CreateQuizProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    // TODO: Valider que le titre n'est pas vide
     if (!title.trim()) {
       alert('Titre requis')
       return
     }
+    // TODO: Valider qu'il y a au moins 1 question
     if (questions.length === 0) {
       alert('Au moins une question requise')
       return
     }
+    // TODO: Valider que chaque question a un texte et 4 choix non-vides
     if (questions.some(q => !q.text.trim() || q.choices.some(c => !c.trim()))) {
       alert('Remplissez tous les champs')
       return
     }
+    // TODO: Appeler onSubmit(title, questions)
     onSubmit(title, questions)
   }
 
-  return (
-    <div className="phase-container">
-      <h1>Creer un Quiz</h1>
-      <form className="create-form" onSubmit={handleSubmit}>
+  return{/* TODO: Champ titre */}
         <div className="form-group">
           <label htmlFor="title">Titre</label>
           <input
             id="title"
             type="text"
             value={title}
+            onChange={e => setTitle(e.target.value)}
+          />
+        </div>
+
+        {/* TODO: Liste des questions avec .question-card */}            value={title}
             onChange={e => setTitle(e.target.value)}
           />
         </div>
@@ -159,9 +167,11 @@ function CreateQuiz({ onSubmit }: CreateQuizProps) {
               />
             </div>
           </div>
-        ))}
-
+        {/* TODO: Bouton ajouter une question */}
         <button type="button" className="btn-add-question" onClick={addQuestion}>
+          + Ajouter une question
+        </button>
+        {/* TODO: Bouton soumettre */}ype="button" className="btn-add-question" onClick={addQuestion}>
           + Ajouter une question
         </button>
         <button type="submit" className="btn-primary">
