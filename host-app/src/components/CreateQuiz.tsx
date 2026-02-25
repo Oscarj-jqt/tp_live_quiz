@@ -95,7 +95,10 @@ function CreateQuiz({ onSubmit }: CreateQuizProps) {
     onSubmit(title, questions)
   }
 
-  return{/* TODO: Champ titre */}
+  return (
+    <div className="create-form">
+      <form onSubmit={handleSubmit}>
+        {/* TODO: Champ titre */}
         <div className="form-group">
           <label htmlFor="title">Titre</label>
           <input
@@ -106,11 +109,7 @@ function CreateQuiz({ onSubmit }: CreateQuizProps) {
           />
         </div>
 
-        {/* TODO: Liste des questions avec .question-card */}            value={title}
-            onChange={e => setTitle(e.target.value)}
-          />
-        </div>
-
+        {/* TODO: Liste des questions avec .question-card */}
         {questions.map((q, i) => (
           <div key={q.id} className="question-card">
             <div className="question-card-header">
@@ -155,7 +154,7 @@ function CreateQuiz({ onSubmit }: CreateQuizProps) {
             </div>
 
             <div className="form-group">
-              <label htmlFor={`timer-${q.id}`}>Durée (s)</label>
+              <label htmlFor={`timer-${q.id}`}>Duree (s)</label>
               <input
                 id={`timer-${q.id}`}
                 type="number"
@@ -167,13 +166,14 @@ function CreateQuiz({ onSubmit }: CreateQuizProps) {
               />
             </div>
           </div>
+        ))}
+
         {/* TODO: Bouton ajouter une question */}
         <button type="button" className="btn-add-question" onClick={addQuestion}>
           + Ajouter une question
         </button>
-        {/* TODO: Bouton soumettre */}ype="button" className="btn-add-question" onClick={addQuestion}>
-          + Ajouter une question
-        </button>
+
+        {/* TODO: Bouton soumettre */}
         <button type="submit" className="btn-primary">
           Creer
         </button>
