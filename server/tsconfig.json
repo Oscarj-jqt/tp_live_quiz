@@ -9,12 +9,14 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["../packages/shared-types/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": [
+  "src/**/*",
+  "../packages/shared-types/**/*"
+],
   "exclude": ["node_modules", "dist"]
 }
