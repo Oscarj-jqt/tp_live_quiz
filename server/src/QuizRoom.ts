@@ -76,7 +76,7 @@ export class QuizRoom {
     // TODO: Envoyer 'joined' a tous les clients
     // On va Utiliser directement broadcast() pour les joueurs + send pour le host
     const playerNames = Array.from(this.players.values()).map(p => p.name)
-    broadcast(this.getPlayerWsList(), { type: 'joined', playerId, players: playerNames })
+    this.broadcastToAll({ type: 'joined', playerId, players: playerNames })
     // TODO: Retourner l'ID du joueur
     return playerId
   }
@@ -178,7 +178,7 @@ export class QuizRoom {
     // TODO: Decrementer remaining
     this.remaining--
     // TODO: Envoyer 'tick' a tous
-    broadcast(this.getPlayerWsList(), { type: 'tick', remaining: this.remaining })
+    this.broadcastToAll({ type: 'tick', remaining: this.remaining })
     // TODO: Si temps ecoule, appeler timeUp()
     if (this.remaining <= 0) {
       this.timeUp()
