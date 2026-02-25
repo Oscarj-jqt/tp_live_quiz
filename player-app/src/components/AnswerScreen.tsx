@@ -35,18 +35,39 @@ interface AnswerScreenProps {
  */
 function AnswerScreen({ question, remaining, onAnswer, hasAnswered }: AnswerScreenProps) {
   // TODO: State optionnel pour stocker l'index du choix selectionne
+  const [selected, setSelected] = useState<number | null>(null)
 
   const handleClick = (index: number) => {
-    // TODO: Appeler onAnswer(index)
+    if (hasAnswered) return
     // TODO: Optionnel : sauvegarder l'index selectionne pour le style .selected
+    setSelected(index)
+    // TODO: Appeler onAnswer(index)
+    onAnswer(index)
   }
+
+  const timerClass = remaining <= 3 ? 'danger' : remaining <= 5 ? 'warning' : ''
 
   return (
     <div className="answer-screen">
       {/* TODO: Timer avec .answer-timer (+ .warning / .danger selon remaining) */}
+      <div className={`answer-timer ${timerClass}`}>{remaining}</div>
       {/* TODO: Texte de la question avec .answer-question */}
+      <p className="answer-question">{question.text}</p>
       {/* TODO: Grille de 4 boutons avec .answer-grid et .answer-btn */}
+      <div className="answer-grid">
+        {question.choices.map((choice, i) => (
+          <button
+            key={i}
+            className={`answer-btn ${selected === i ? 'selected' : ''}`}
+            onClick={() => handleClick(i)}
+            disabled={hasAnswered}
+          >
+            {choice}
+          </button>
+        ))}
+      </div>
       {/* TODO: Message "Reponse envoyee !" si hasAnswered */}
+      {hasAnswered && <p className="answered-message">Reponse envoyee !</p>}
     </div>
   )
 }
