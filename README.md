@@ -153,3 +153,8 @@ Host App                    Serveur                     Player App
 - Reponse correcte : 1000 points de base
 - Bonus de rapidite : jusqu'a +500 points selon le temps restant
 - Formule : `score = 1000 + Math.round(500 * (remaining / timerSec))`
+
+# Contributeur 
+- Gabrielle M'fOUMOUNE 
+- Oscard JACQUET
+- DANALI MABANZA
